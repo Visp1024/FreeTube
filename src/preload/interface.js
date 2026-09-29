@@ -33,6 +33,13 @@ export default {
   /**
    * @returns {Promise<boolean>}
    */
+  loginGoogleAccount: () => {
+    return ipcRenderer.invoke(IpcChannels.GOOGLE_ACCOUNT_LOGIN)
+  },
+
+  /**
+   * @returns {Promise<boolean>}
+   */
   isWaylandPlatform: () => {
     return ipcRenderer.invoke(IpcChannels.IS_WAYLAND_PLATFORM)
   },

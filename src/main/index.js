@@ -28,6 +28,7 @@ import contextMenu from 'electron-context-menu'
 
 import packageDetails from '../../package.json'
 import { handleOpenInExternalPlayer } from './externalPlayer'
+import { initGoogleAccount, openLoginWindow, setGoogleAccountProxy } from './googleAccount'
 import { generatePoToken } from './poTokenGenerator'
 import { isFreeTubeUrl } from './utils'
 
@@ -553,6 +554,7 @@ function runApp() {
       session.defaultSession.setProxy({
         proxyRules: proxyUrl
       })
+      setGoogleAccountProxy({ proxyRules: proxyUrl })
     }
 
     const fixedUserAgent = session.defaultSession.getUserAgent()
@@ -560,6 +562,7 @@ function runApp() {
       .filter(part => !part.includes('Electron') && !part.includes(packageDetails.productName))
       .join(' ')
     session.defaultSession.setUserAgent(fixedUserAgent)
+    await initGoogleAccount(fixedUserAgent)
 
     // Set CONSENT cookie on reasonable domains
     const consentCookieDomains = [
@@ -1326,6 +1329,7 @@ function runApp() {
     session.defaultSession.setProxy({
       proxyRules: url
     })
+    setGoogleAccountProxy({ proxyRules: url })
     proxyUrl = url
     session.defaultSession.closeAllConnections()
   })
@@ -1336,6 +1340,7 @@ function runApp() {
     }
 
     session.defaultSession.setProxy({})
+    setGoogleAccountProxy({})
     proxyUrl = undefined
     session.defaultSession.closeAllConnections()
   })
@@ -1380,6 +1385,14 @@ function runApp() {
   })
 
   // #endregion navigation history
+
+  ipcMain.handle(IpcChannels.GOOGLE_ACCOUNT_LOGIN, async (event) => {
+    if (!isFreeTubeUrl(event.senderFrame.url)) {
+      return false
+    }
+
+    return await openLoginWindow(BrowserWindow.fromWebContents(event.sender))
+  })
 
   ipcMain.handle(IpcChannels.GET_SYSTEM_LOCALE, (event) => {
     if (isFreeTubeUrl(event.senderFrame.url)) {

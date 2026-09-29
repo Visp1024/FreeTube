@@ -10,6 +10,7 @@ const IpcChannels = {
   CREATE_NEW_WINDOW: 'create-new-window',
   NATIVE_THEME_UPDATE: 'native-theme-update',
   APP_READY: 'app-ready',
+  GOOGLE_ACCOUNT_LOGIN: 'google-account-login',
   RELAUNCH_REQUEST: 'relaunch-request',
   SET_WINDOW_TITLE: 'set-window-title',
 
